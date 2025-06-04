@@ -2731,7 +2731,12 @@ useEffect(() => {
   const { data: listener } = supabase.auth.onAuthStateChange(async (event, session) => {
     if (event === "SIGNED_IN" && session) {
       console.log("🔁 Chamando função sync-user-profile...");
-      await supabase.functions.invoke("sync-user-profile");
+      await supabase.functions.invoke("sync-user-profile", {
+  body: {},
+  headers: {
+    "Content-Type": "application/json"
+  }
+});
     }
   });
 
