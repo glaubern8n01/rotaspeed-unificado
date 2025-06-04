@@ -1,0 +1,9 @@
+{
+  "name": "RotaSpeed",
+  "description": "Um painel web para entregadores organizarem e otimizarem suas entregas diárias, com reconhecimento de endereços e geração de rotas otimizadas usando IA.",
+  "requestFramePermissions": [
+    "camera",
+    "microphone"
+  ],
+  "prompt": ""
+}
