@@ -12,15 +12,19 @@ if (!supabaseUrl || !supabaseServiceRoleKey) {
 const supabaseAdmin: SupabaseClient = createClient(supabaseUrl!, supabaseServiceRoleKey!);
 
 Deno.serve(async (req: Request) => {
+  // **CORS**: adicionamos x-client-info aqui
   const corsHeaders = {
     'Access-Control-Allow-Origin': '*',
     'Access-Control-Allow-Methods': 'POST, OPTIONS',
-    'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+    'Access-Control-Allow-Headers': 'Content-Type, Authorization, x-client-info',
   };
 
+  // Preflight
   if (req.method === 'OPTIONS') {
     return new Response(null, { status: 204, headers: corsHeaders });
   }
+
+  // Só aceitamos POST
   if (req.method !== 'POST') {
     return new Response(JSON.stringify({ message: "Use POST" }), {
       status: 405,
@@ -28,6 +32,7 @@ Deno.serve(async (req: Request) => {
     });
   }
 
+  // Parse JSON
   let body;
   try {
     body = await req.json();
@@ -46,23 +51,22 @@ Deno.serve(async (req: Request) => {
   }
 
   try {
-    // --- aqui entra sua lógica de fetch/insert de perfil ---
-    // Exemplo simplificado:
+    // Verifica se já existe
     const { data: existing, error: errFetch } = await supabaseAdmin
       .from('usuarios_rotaspeed')
       .select('*')
       .eq('id', userId)
       .maybeSingle();
-
     if (errFetch) throw errFetch;
+
     if (existing) {
-      return new Response(JSON.stringify({ profile: existing }), {
+      return new Response(JSON.stringify({ profile: existing, message: "Profile already exists." }), {
         status: 200,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' }
       });
     }
 
-    // Cria perfil novo
+    // Cria novo perfil
     const newProfile = {
       id: userId,
       email,
@@ -85,10 +89,11 @@ Deno.serve(async (req: Request) => {
       .single();
     if (errInsert) throw errInsert;
 
-    return new Response(JSON.stringify({ profile: created }), {
+    return new Response(JSON.stringify({ profile: created, message: "Profile created." }), {
       status: 201,
       headers: { ...corsHeaders, 'Content-Type': 'application/json' }
     });
+
   } catch (error: any) {
     return new Response(JSON.stringify({ message: error.message }), {
       status: 500,
