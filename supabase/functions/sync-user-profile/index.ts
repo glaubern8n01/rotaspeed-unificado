@@ -3,6 +3,8 @@
 
 declare const Deno: any;
 import { createClient, SupabaseClient } from 'https://esm.sh/@supabase/supabase-js@^2.44.4';
+// Importa os cabeçalhos CORS compartilhados
+import { corsHeaders } from '../_shared/cors.ts';
 
 const supabaseUrl = Deno.env.get('SUPABASE_URL');
 const supabaseServiceRoleKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY');
@@ -12,14 +14,7 @@ if (!supabaseUrl || !supabaseServiceRoleKey) {
 const supabaseAdmin: SupabaseClient = createClient(supabaseUrl!, supabaseServiceRoleKey!);
 
 Deno.serve(async (req: Request) => {
-  // CORS: agora com x-client-info e apikey autorizados
-  const corsHeaders = {
-    'Access-Control-Allow-Origin': '*',
-    'Access-Control-Allow-Methods': 'POST, OPTIONS',
-    'Access-Control-Allow-Headers': 'Content-Type, Authorization, x-client-info, apikey',
-  };
-
-  // Preflight
+  // Preflight CORS
   if (req.method === 'OPTIONS') {
     return new Response(null, { status: 204, headers: corsHeaders });
   }
