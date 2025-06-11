@@ -12,11 +12,11 @@ if (!supabaseUrl || !supabaseServiceRoleKey) {
 const supabaseAdmin: SupabaseClient = createClient(supabaseUrl!, supabaseServiceRoleKey!);
 
 Deno.serve(async (req: Request) => {
-  // **CORS**: adicionamos x-client-info aqui
+  // CORS: agora com x-client-info e apikey autorizados
   const corsHeaders = {
     'Access-Control-Allow-Origin': '*',
     'Access-Control-Allow-Methods': 'POST, OPTIONS',
-    'Access-Control-Allow-Headers': 'Content-Type, Authorization, x-client-info',
+    'Access-Control-Allow-Headers': 'Content-Type, Authorization, x-client-info, apikey',
   };
 
   // Preflight
